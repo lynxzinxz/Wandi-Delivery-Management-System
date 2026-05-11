@@ -1,6 +1,5 @@
 package wandideliverymanagementsystem;
 
-import java.util.ArrayList;
 import java.util.*;
 
 public class WandiDeliveryManagementSystem {
@@ -17,13 +16,13 @@ public class WandiDeliveryManagementSystem {
                 + "----------------------------------------------------");
     }
 
-    public static int addOrder(Scanner scanner, String[] status, ArrayList<String> orderId, ArrayList<String> senderName, ArrayList<String> recipientName, int count) {
+    public static int addOrder(Scanner scanner, ArrayList<String> orderStatus, String[] status, ArrayList<String> orderId, ArrayList<String> senderName, ArrayList<String> recipientName, int count) {
         int i = 0;
         System.out.println("====================================================\n"
                 + "                      ADD ORDER\n"
                 + "====================================================");
-
-        System.out.print("Enter Order ID: ");
+        System.out.println();
+        System.out.print("Enter Order ID  : ");
         String id = scanner.nextLine();
         orderId.add(id);
         if (count > 1) {//Checks if first time using addOrder() function
@@ -33,8 +32,8 @@ public class WandiDeliveryManagementSystem {
                         continue;// Skip the entire loop
                     }
                     System.out.println("----------------------------------------------------");
-                    System.out.println("Error: Order ID " + orderId.get(count - 1) + " already exists.");
-                    System.out.println("Use option [5] to update its status instead.");
+                    System.out.println("        ✓ Error: Order ID " + orderId.get(count - 1) + " already exists.");
+                    System.out.println("     Use option [5] to update its status instead.");
                     System.out.println("----------------------------------------------------");
                     i++;// for while loop to not function
                     orderId.remove(count - 1);
@@ -45,27 +44,30 @@ public class WandiDeliveryManagementSystem {
         }
 
         while (i == 0) {
-            System.out.print("Sender Name   : ");
+            System.out.print("Sender Name     : ");
             String sender = scanner.nextLine();
             senderName.add(sender);
 
-            System.out.print("Recipient Name: ");
+            System.out.print("Recipient Name  : ");
             String reciever = scanner.nextLine();
             recipientName.add(reciever);
+            System.out.println();
 
             System.out.println("----------------------------------------------------");
-            System.out.println("Order " + id + " added successfully!");
-            System.out.println("Status set to: [" + status[0] + "]");
+            System.out.println("          ✓ Order " + id + " added successfully!");
+            orderStatus.add(status[0]); //// when a new order is added, its default status is automatically set to "Preparing"
+            System.out.println("             Status set to: [" + orderStatus.get(orderStatus.size() - 1) + "]"); // prints the most recently added order status (last item in the list)
             System.out.println("----------------------------------------------------");
             i++;//Iteration to stop the loop entirely
         }
-
+        
+        System.out.println();
         System.out.println("Press ENTER to return to menu...");
         scanner.nextLine();
         return count;
     }
 
-    public static int deleteOrder(Scanner scanner, String[] status, ArrayList<String> orderId, ArrayList<String> senderName, ArrayList<String> recipientName, int count) {
+    public static int deleteOrder(Scanner scanner, ArrayList<String> orderStatus, String[] status, ArrayList<String> orderId, ArrayList<String> senderName, ArrayList<String> recipientName, int count) {
         System.out.println("====================================================\n"
                 + "                    DELETE ORDER\n"
                 + "====================================================");
@@ -114,7 +116,7 @@ public class WandiDeliveryManagementSystem {
         return count;
     }
 
-    public static void searchOrder(Scanner scanner, String[] status, ArrayList<String> orderId, ArrayList<String> senderName, ArrayList<String> recipientName, int count) {
+    public static void searchOrder(Scanner scanner, ArrayList<String> orderStatus, String[] status, ArrayList<String> orderId, ArrayList<String> senderName, ArrayList<String> recipientName, int count) {
         System.out.println("====================================================\n"
                 + "                    SEARCH ORDER\n"
                 + "====================================================");
@@ -153,51 +155,88 @@ public class WandiDeliveryManagementSystem {
         scanner.nextLine();
     }
 
-    public static void ViewOrders() {
-        System.out.println();
+    // viewOrders method
+    public static void ViewOrders(Scanner scanner, ArrayList<String> orderStatus, String[] status, ArrayList<String> orderId, ArrayList<String> senderName, ArrayList<String> recipientName, int count) {
+
         System.out.println("====================================================\n"
                 + "         WANDI TRACKING SYSTEM — ALL ORDERS\n"
                 + "====================================================");
         System.out.println();
 
-//        for 
-//        System.out.println("[ Preparing ]                              3 orders ");
-//        System.out.println("-----------------------------------------------------");
-//        System.out.println("  #1  SPX100267       Juan dela Cruz");
-//        System.out.println("-----------------------------------------------------");
+        // if there are no orders, stop the method
+        if (count == 0) {
+            System.out.print("No orders available.");
+            return;
+        }
+
+        String[] categories = {"Preparing", "Packed", "Shipped", "Delivered"};
+
+        // outer loop through each status category
+        for (String currentStatus : categories) {
+            int statusCount = 0;    // counts how many orders are in this status
+            int num = 1;
+
+            // first loop: count how many orders match this status
+            for (int i = 0; i < count; i++) {
+                if (orderStatus.get(i).equals(currentStatus)) {
+                    statusCount++;
+                }
+            }
+
+            System.out.println("[ " + currentStatus + " ] - " + statusCount + " orders");
+            System.out.println("--------------------------------------------------");
+
+            // second loop: display orders under this status
+            for (int i = 0; i < count; i++) {
+                if (orderStatus.get(i).equals(currentStatus)) {
+                    System.out.printf("#%-3d %-12s %-15s %-15s%n",
+                            num,
+                            orderId.get(i),
+                            senderName.get(i),
+                            recipientName.get(i));
+//                    System.out.println("#" + (num) + "    " + orderId.get(i) + "    " + senderName.get(i) + "    " + recipientName.get(i));
+                    num++;
+                }
+            }
+            System.out.println();
+        }
+        System.out.println("Press ENTER to return to menu...");
+        scanner.nextLine();
     }
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        String[] status = {"Preparing", "Packed ", "Shipped", "Delivered",};
+        String[] status = {"Preparing", "Packed", "Shipped", "Delivered",};
         ArrayList<String> orderId = new ArrayList<>();
         ArrayList<String> senderName = new ArrayList<>();
         ArrayList<String> recipientName = new ArrayList<>();
+        ArrayList<String> orderStatus = new ArrayList<>();
         int count = 0;
-        Scanner sc = new Scanner(System.in);
         int option;
 
         do {
             ShowMenu();
             System.out.print("Select option: ");
-            option = sc.nextInt();
+            option = scanner.nextInt();
+            System.out.println();
+            scanner.nextLine();
 
             switch (option) {
                 case 1:
                     count++;
-                    count = addOrder(scanner, status, orderId, senderName, recipientName, count);
+                    count = addOrder(scanner, orderStatus, status, orderId, senderName, recipientName, count);
                     break;
 
                 case 2:
-                    count = deleteOrder(scanner, status, orderId, senderName, recipientName, count);
+                    count = deleteOrder(scanner, orderStatus, status, orderId, senderName, recipientName, count);
                     break;
 
                 case 3:
-                    searchOrder(scanner, status, orderId, senderName, recipientName, count);
+                    searchOrder(scanner, orderStatus, status, orderId, senderName, recipientName, count);
                     break;
 
                 case 4:
-                    ViewOrders();
+                    ViewOrders(scanner, orderStatus, status, orderId, senderName, recipientName, count);
                     break;
 
 //              case 5:
