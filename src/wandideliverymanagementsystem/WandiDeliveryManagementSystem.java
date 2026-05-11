@@ -4,18 +4,6 @@ import java.util.*;
 
 public class WandiDeliveryManagementSystem {
 
-    public static void ShowMenu() {
-        System.out.println("====================================================\n"
-                + "            Wandi Delivery Tracking System\n"
-                + "====================================================");
-
-        System.out.println("  [1]  Add Order             [4]  View Orders \n"
-                + "  [2]  Delete Order          [5]  Update Status\n"
-                + "  [3]  Search Order          [6]  Filter by Status\n"
-                + "        \t   [7]  Exit\n"
-                + "----------------------------------------------------");
-    }
-
     public static int addOrder(Scanner scanner, ArrayList<String> orderStatus, String[] status, ArrayList<String> orderId, ArrayList<String> senderName, ArrayList<String> recipientName, int count) {
         int i = 0;
         System.out.println("====================================================\n"
@@ -32,8 +20,8 @@ public class WandiDeliveryManagementSystem {
                         continue;// Skip the entire loop
                     }
                     System.out.println("----------------------------------------------------");
-                    System.out.println("        ✓ Error: Order ID " + orderId.get(count - 1) + " already exists.");
-                    System.out.println("     Use option [5] to update its status instead.");
+                    System.out.println("            ✗ Error: Order ID " + orderId.get(count - 1) + " already exists.");
+                    System.out.println("         Use option [5] to update its status instead.");
                     System.out.println("----------------------------------------------------");
                     i++;// for while loop to not function
                     orderId.remove(count - 1);
@@ -55,12 +43,12 @@ public class WandiDeliveryManagementSystem {
 
             System.out.println("----------------------------------------------------");
             System.out.println("          ✓ Order " + id + " added successfully!");
-            orderStatus.add(status[0]); //// when a new order is added, its default status is automatically set to "Preparing"
+            orderStatus.add(status[0]); // when a new order is added, its default status is automatically set to "Preparing"
             System.out.println("             Status set to: [" + orderStatus.get(orderStatus.size() - 1) + "]"); // prints the most recently added order status (last item in the list)
             System.out.println("----------------------------------------------------");
             i++;//Iteration to stop the loop entirely
         }
-        
+
         System.out.println();
         System.out.println("Press ENTER to return to menu...");
         scanner.nextLine();
@@ -71,28 +59,32 @@ public class WandiDeliveryManagementSystem {
         System.out.println("====================================================\n"
                 + "                    DELETE ORDER\n"
                 + "====================================================");
-        System.out.print("Enter Order ID: ");
+        System.out.println();
+        System.out.print("Enter Order ID  : ");
         String id = scanner.nextLine();
+        System.out.println();
+
         int i = 0;
-        System.out.println("----------------------------------------------------");
 
         if (count < 1) {
             System.out.println("----------------------------------------------------");
-            System.out.println("Error: Order ID " + id + " not found.");
-            System.out.println("Check the ID and try again.");
+            System.out.println("          ✗ Error: Order ID " + id + " not found.");
+            System.out.println("              Check the ID and try again.");
             System.out.println("----------------------------------------------------");
         } else {
             for (int t = 0; t < count; t++) {
                 if (orderId.get(t).equals(id)) {
-                    System.out.println("Order Found: ");
-                    System.out.println("ID     : " + id);
-                    System.out.println("Status : " + status[0]);
+                    System.out.println("----------------------------------------------------\n"
+                            + "                   ORDER DETAILS\n"
+                            + "----------------------------------------------------");
+                    System.out.println("ID      : " + id);
+                    System.out.println("Status  : " + status[0]);
                     System.out.println("----------------------------------------------------");
-                    System.out.print("Are you sure you want to delete order? (Y/N): ");
+                    System.out.print("Are you sure you want to delete this order? (Y/N): ");
                     char answer = scanner.next().charAt(0);
                     if (answer == 'Y') {
                         System.out.println("----------------------------------------------------");
-                        System.out.println("Order " + id + " has been deleted.");
+                        System.out.println("             Order " + id + " has been deleted.");
                         System.out.println("----------------------------------------------------");
                         orderId.remove(t);
                         senderName.remove(t);
@@ -105,8 +97,8 @@ public class WandiDeliveryManagementSystem {
             }
             while (i == 0) {
                 System.out.println("----------------------------------------------------");
-                System.out.println("Error: Order ID " + id + " not found.");
-                System.out.println("Check the ID and try again.");
+                System.out.println("            ✗ Error: Order ID " + id + " not found.");
+                System.out.println("              Check the ID and try again.");
                 System.out.println("----------------------------------------------------");
                 i++;
             }
@@ -120,13 +112,15 @@ public class WandiDeliveryManagementSystem {
         System.out.println("====================================================\n"
                 + "                    SEARCH ORDER\n"
                 + "====================================================");
+        System.out.println();
         System.out.print("Enter Order ID: ");
         String id = scanner.nextLine();
+        System.out.println();
         int i = 0;
         if (count < 1) {
             System.out.println("----------------------------------------------------");
-            System.out.println("Error: Order ID " + id + " not found.");
-            System.out.println("Check the ID and try again.");
+            System.out.println("            ✗ Error: Order ID " + id + " not found.");
+            System.out.println("              Check the ID and try again.");
             System.out.println("----------------------------------------------------");
         } else {
             for (int z = 0; z < count; z++) {
@@ -134,18 +128,21 @@ public class WandiDeliveryManagementSystem {
                     System.out.println("----------------------------------------------------\n"
                             + "                   ORDER DETAILS\n"
                             + "----------------------------------------------------");
+                    System.out.println();
                     System.out.println("Order ID  : " + orderId.get(z));
                     System.out.println("Sender    : " + senderName.get(z));
                     System.out.println("Recipient : " + recipientName.get(z));
                     System.out.println("Status    : " + status[0]);
+                    System.out.println();
+                    System.out.println("----------------------------------------------------");
                     i++;
                     break;
                 }
             }
             while (i == 0) {
                 System.out.println("----------------------------------------------------");
-                System.out.println("Error: Order ID " + id + " not found.");
-                System.out.println("Check the ID and try again.");
+                System.out.println("            ✗ Error: Order ID " + id + " not found.");
+                System.out.println("              Check the ID and try again.");
                 System.out.println("----------------------------------------------------");
                 i++;
             }
@@ -183,23 +180,30 @@ public class WandiDeliveryManagementSystem {
                 }
             }
 
-            System.out.println("[ " + currentStatus + " ] - " + statusCount + " orders");
-            System.out.println("--------------------------------------------------");
+            // if statusCount has orders then print
+            // print only that has a orders
+            if (statusCount > 0) {
+                System.out.println("[ " + currentStatus + " ] - " + statusCount + " orders");
+                System.out.println("--------------------------------------------------");
+                System.out.println("#   ORDER ID       SENDER             RECIPIENT");
 
-            // second loop: display orders under this status
-            for (int i = 0; i < count; i++) {
-                if (orderStatus.get(i).equals(currentStatus)) {
-                    System.out.printf("#%-3d %-12s %-15s %-15s%n",
-                            num,
-                            orderId.get(i),
-                            senderName.get(i),
-                            recipientName.get(i));
-//                    System.out.println("#" + (num) + "    " + orderId.get(i) + "    " + senderName.get(i) + "    " + recipientName.get(i));
-                    num++;
+                // second loop: display orders under this status
+                for (int i = 0; i < count; i++) {
+                    if (orderStatus.get(i).equals(currentStatus)) {
+                        System.out.printf("%-3d %-14s %-18s %-17s%n",
+                                num,
+                                orderId.get(i),
+                                senderName.get(i),
+                                recipientName.get(i));
+                        num++;
+                    }
                 }
             }
-            System.out.println();
         }
+        System.out.println();
+        System.out.println("--------------------------------------------------\n"
+                + "TOTAL ORDERS: " + orderId.size()
+                + "\n-------------------------------------------------- ");
         System.out.println("Press ENTER to return to menu...");
         scanner.nextLine();
     }
@@ -215,7 +219,15 @@ public class WandiDeliveryManagementSystem {
         int option;
 
         do {
-            ShowMenu();
+            System.out.println("====================================================\n"
+                    + "            Wandi Delivery Tracking System\n"
+                    + "====================================================");
+
+            System.out.println("  [1]  Add Order             [4]  View Orders \n"
+                    + "  [2]  Delete Order          [5]  Update Status\n"
+                    + "  [3]  Search Order          [6]  Filter by Status\n"
+                    + "        \t   [7]  Exit\n"
+                    + "----------------------------------------------------");
             System.out.print("Select option: ");
             option = scanner.nextInt();
             System.out.println();
