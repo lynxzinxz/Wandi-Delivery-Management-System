@@ -78,7 +78,7 @@ public class WandiDeliveryManagementSystem {
                             + "                   ORDER DETAILS\n"
                             + "----------------------------------------------------");
                     System.out.println("ID      : " + id);
-                    System.out.println("Status  : " + status[0]);
+                    System.out.println("Status  : " + orderStatus.get(t));
                     System.out.println("----------------------------------------------------");
                     System.out.print("Are you sure you want to delete this order? (Y/N): ");
                     char answer = scanner.next().charAt(0);
@@ -132,7 +132,7 @@ public class WandiDeliveryManagementSystem {
                     System.out.println("Order ID  : " + orderId.get(z));
                     System.out.println("Sender    : " + senderName.get(z));
                     System.out.println("Recipient : " + recipientName.get(z));
-                    System.out.println("Status    : " + status[0]);
+                    System.out.println("Status    : " + orderStatus.get(z));
                     System.out.println();
                     System.out.println("----------------------------------------------------");
                     i++;
@@ -162,7 +162,7 @@ public class WandiDeliveryManagementSystem {
 
         // if there are no orders, stop the method
         if (count == 0) {
-            System.out.print("No orders available.");
+            System.out.println("No orders available.");
             return;
         }
 
@@ -208,9 +208,94 @@ public class WandiDeliveryManagementSystem {
         scanner.nextLine();
     }
 
+    public static void updateStatus(Scanner scanner, ArrayList<String> orderStatus, String[] status, ArrayList<String> orderId, ArrayList<String> senderName, ArrayList<String> recipientName, int count) {
+        System.out.println("====================================================\n"
+                + "                    UPDATE STATUS                 \n"
+                + "====================================================");
+        System.out.println();
+        System.out.print("Enter Order ID  : ");
+        String id = scanner.nextLine();
+        System.out.println();
+        char answer = ' ';
+        int x = 0;
+        if (count < 1) {
+            System.out.println("----------------------------------------------------");
+            System.out.println("          ✗ Error: Order ID " + id + " not found.");
+            System.out.println("              Check the ID and try again.");
+            System.out.println("----------------------------------------------------");
+        } else {
+            for (int t = 0; t < count; t++) {
+                if (orderId.get(t).equals(id)) {
+                    System.out.println("ORDER FOUND");
+                    System.out.println("ID      : " + id);
+                    System.out.println("Current : " + orderStatus.get(t));
+                    //"Preparing", "Packed", "Shipped", "Delivered"
+                    if (orderStatus.get(t).equals(status[0])) {
+                        System.out.println("Next    : [" + status[1] + "]   ← will be set");
+                        System.out.print("Confirm update to " + status[1].toUpperCase() + "? (Y/N): ");
+                        answer = scanner.next().charAt(0);
+
+                    } else if (orderStatus.get(t).equals(status[1])) {
+                        System.out.println("Next    : [" + status[2] + "]   ← will be set");
+                        System.out.print("Confirm update to " + status[2].toUpperCase() + "? (Y/N): ");
+                        answer = scanner.next().charAt(0);
+
+                    } else if (orderStatus.get(t).equals(status[2])) {
+                        System.out.println("Next    : [" + status[3] + "]   ← will be set");
+                        System.out.println("----------------------------------------------------");
+                        System.out.print("Confirm update to " + status[3].toUpperCase() + "? (Y/N): ");
+                        answer = scanner.next().charAt(0);
+                    } else {
+                        System.out.println("----------------------------------------------------");
+                        System.out.println("            ✗ Order " + orderId.get(t) + " is already " + status[3].toUpperCase() + ".");
+                        System.out.println("               No further updates possible.");
+                        System.out.println("----------------------------------------------------");
+                    }
+
+                    if (answer == 'Y') {
+                        System.out.println("----------------------------------------------------");
+
+                        if (orderStatus.get(t).equals(status[0])) {
+                            System.out.println("             ✓ " + orderId.get(t) + " successfully updated!");
+                            System.out.println("             [" + orderStatus.get(t) + "] → [" + status[1] + "]");
+
+                            orderStatus.set(t, status[1]); //Changing the value of index t to desired value
+
+                        } else if (orderStatus.get(t).equals(status[1])) {
+                            System.out.println("             ✓ " + orderId.get(t) + " successfully updated!");
+                            System.out.println("             [" + orderStatus.get(t) + "] → [" + status[2] + "]");
+
+                            orderStatus.set(t, status[2]);//Changing the value of index t to desired value
+
+                        } else {
+                            System.out.println("             ✓ " + orderId.get(t) + " successfully updated!");
+                            System.out.println("             [" + orderStatus.get(t) + "] → [" + status[3] + "]");
+
+                            orderStatus.set(t, status[3]);//Changing the value of index t to desired value
+
+                        }
+
+                        System.out.println("----------------------------------------------------");
+                        break;
+                    }
+                    x++;//For while loop to not function
+                }
+                while (x == 0) {
+                    System.out.println("----------------------------------------------------");
+                    System.out.println("            ✗ Error: Order ID " + id + " not found.");
+                    System.out.println("              Check the ID and try again.");
+                    System.out.println("----------------------------------------------------");
+                    x++;
+                }
+            }
+        }
+        System.out.println("Press ENTER to return to menu...");
+        scanner.nextLine();
+    }
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        String[] status = {"Preparing", "Packed", "Shipped", "Delivered",};
+        String[] status = {"Preparing", "Packed", "Shipped", "Delivered"};
         ArrayList<String> orderId = new ArrayList<>();
         ArrayList<String> senderName = new ArrayList<>();
         ArrayList<String> recipientName = new ArrayList<>();
@@ -251,9 +336,9 @@ public class WandiDeliveryManagementSystem {
                     ViewOrders(scanner, orderStatus, status, orderId, senderName, recipientName, count);
                     break;
 
-//              case 5:
-//                  UpdateStatus;
-//                  break;
+                case 5:
+                    updateStatus(scanner, orderStatus, status, orderId, senderName, recipientName, count);
+                    break;
 //               
 //              case 6:
 //                  FilterByStatus();
