@@ -183,6 +183,7 @@ public class WandiDeliveryManagementSystem {
             // if statusCount has orders then print
             // print only that has a orders
             if (statusCount > 0) {
+                System.out.println();
                 System.out.println("[ " + currentStatus + " ] - " + statusCount + " orders");
                 System.out.println("--------------------------------------------------");
                 System.out.println("#   ORDER ID       SENDER             RECIPIENT");
@@ -293,6 +294,87 @@ public class WandiDeliveryManagementSystem {
         scanner.nextLine();
     }
 
+    // FILTER
+    public static void FilterByStatus(Scanner scanner, ArrayList<String> orderStatus, String[] status, ArrayList<String> orderId, ArrayList<String> senderName, ArrayList<String> recipientName) {
+        System.out.println("====================================================\n"
+                + "                  FILTER BY STATUS\n"
+                + "====================================================");
+        System.out.println();
+
+        System.out.println("  [1]  Preparing             [3]  Shipped \n"
+                + "  [2]  Packed                [4]  Delivered\n"
+                + "        \t   [5]  Exit\n"
+                + "----------------------------------------------------");
+        System.out.print("Select status: ");
+        int statusChoice = scanner.nextInt();
+        System.out.println("");
+        scanner.nextLine();
+
+        if (statusChoice == 5) {
+            return;
+        }
+
+        // Variable that will store the selected status text
+        String selectedStatus = "";
+
+        // Convert number choice into a status name
+        switch (statusChoice) {
+            case 1:
+                selectedStatus = "Preparing";
+                break;
+            case 2:
+                selectedStatus = "Packed";
+                break;
+            case 3:
+                selectedStatus = "Shipped";
+                break;
+            case 4:
+                selectedStatus = "Delivered";
+                break;
+        }
+
+        // Variable used to count matching orders
+        int statusCount = 0;
+
+        for (int i = 0; i < orderStatus.size(); i++) {
+
+            if (orderStatus.get(i).equals(selectedStatus)) {
+                statusCount++;
+            }
+        }
+
+        if (statusCount == 0) {
+            // Message if no orders match the selected status
+            System.out.println("No orders found under [ " + selectedStatus + " ] status.");
+        } else {
+            
+            System.out.println("[ " + selectedStatus + " ] - " + statusCount + " orders");
+
+            System.out.println("--------------------------------------------------");
+            System.out.println("#   ORDER ID       SENDER             RECIPIENT");
+
+            for (int s = 0; s < orderId.size(); s++) {
+                int num = 1;
+
+                if (orderStatus.get(s).equals(selectedStatus)) {
+
+                    // display orders under this status
+                    System.out.printf("%-3d %-14s %-18s %-17s%n",
+                            num,
+                            orderId.get(s),
+                            senderName.get(s),
+                            recipientName.get(s));
+                }
+                num++;
+            }
+
+        }
+
+        System.out.println();
+        System.out.println("Press ENTER to return to menu...");
+        scanner.nextLine();
+    }
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         String[] status = {"Preparing", "Packed", "Shipped", "Delivered"};
@@ -339,14 +421,15 @@ public class WandiDeliveryManagementSystem {
                 case 5:
                     updateStatus(scanner, orderStatus, status, orderId, senderName, recipientName, count);
                     break;
-//               
-//              case 6:
-//                  FilterByStatus();
-//                  break;
+
+                case 6:
+                    FilterByStatus(scanner, orderStatus, status, orderId, senderName, recipientName);
+                    break;
             }
         } while (option != 7);
-        System.out.println(orderId);
-        System.out.println(senderName);
-        System.out.println(recipientName);
+        
+//        System.out.println(orderId);
+//        System.out.println(senderName);
+//        System.out.println(recipientName);
     }
 }
