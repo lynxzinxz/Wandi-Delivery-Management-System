@@ -523,6 +523,7 @@ public class WandiDeliveryManagementSystem {
         int option = 0;
 
         do {
+
             System.out.println("====================================================\n"
                     + "            Wandi Delivery Tracking System\n"
                     + "====================================================");
@@ -532,11 +533,29 @@ public class WandiDeliveryManagementSystem {
                     + "  [3]  Search Order          [6]  Filter by Status\n"
                     + "        \t   [7]  Exit\n"
                     + "----------------------------------------------------");
-            System.out.print("Select option: ");
-            //not to cause potential crash
-            if (scanner.hasNextInt()) {
-                option = scanner.nextInt();
+            while (true) {
+                System.out.print("Select option: ");
+                if (scanner.hasNextInt()) {
+                    option = scanner.nextInt();
+                    break;
+                } else {
+                    System.out.println("Invalid input! Please try again. ");
+                    scanner.next();
+                }
+
             }
+
+            /*               
+            while (id.isBlank()) {
+            System.out.print("Enter Order ID  : ");
+            id = scanner.nextLine();
+
+            if (id.isBlank()) {
+                System.out.println("ID cannot be blank ");
+                System.out.println();
+            }
+        }
+             */
             System.out.println();
             scanner.nextLine();
 
