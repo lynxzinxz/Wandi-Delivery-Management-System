@@ -166,7 +166,7 @@ public class WandiDeliveryManagementSystem {
                 // printOrderDetails() is a reusable method that displays the full details of an order
                 // (Order ID, Sender, Recipient, Status) using the index i to find the right order across all lists
                 printOrderDetails(i, orderId, senderName, recipientName, orderStatus);
-                
+
                 // confirmation loop -- ask user for confirm deletion
                 // keeps asking until Y or N is entered
                 while (true) {
@@ -231,8 +231,8 @@ public class WandiDeliveryManagementSystem {
         for (int i = 0; i < orderId.size(); i++) {
 
             if (orderId.get(i).equals(id)) { // if match found, display order details
-            // reuse printOrderDetails() to display the found order's full details
-            printOrderDetails(i, orderId, senderName, recipientName, orderStatus);
+                // reuse printOrderDetails() to display the found order's full details
+                printOrderDetails(i, orderId, senderName, recipientName, orderStatus);
 
                 pause(scanner);
                 return; // early exit
@@ -447,18 +447,17 @@ public class WandiDeliveryManagementSystem {
         while (true) {
             System.out.print("Select status: ");
 
-            // Check if input is a number
-            if (!scanner.hasNextInt()) {
-                scanner.nextLine();  // if input is not a number then clear the invalid input and try again
+            try {
+                // read the number input, store in status choice
+                statusChoice = scanner.nextInt();
+            } catch (InputMismatchException e) {
+                scanner.nextLine();  // if not a number, clear invalid input
                 System.out.println("----------------------------------------------------\n"
                         + "                 ✗ Invalid input.\n"
                         + "          Please select from [1 - 5].\n"
                         + "----------------------------------------------------\n");
-                continue; // restart loop
+                continue; // ask user again 
             }
-
-            // read the number input, store in status choice
-            statusChoice = scanner.nextInt();
             scanner.nextLine(); // consume the leftover newline after reading the integer
             System.out.println();
 
@@ -573,8 +572,9 @@ public class WandiDeliveryManagementSystem {
             while (true) {
                 System.out.print("Select option: ");
 
-                // check if user inpput is a number
-                if (!scanner.hasNextInt()) {
+                try {
+                    option = scanner.nextInt();
+                } catch (InputMismatchException e) {
                     scanner.nextLine();  // if not a number, clear invalid input
                     System.out.println();
                     System.out.println("----------------------------------------------------\n"
@@ -584,7 +584,6 @@ public class WandiDeliveryManagementSystem {
                     continue; // ask user again 
                 }
 
-                option = scanner.nextInt();
                 scanner.nextLine(); // consume leftover newline after nextInt()
                 System.out.println();
 
