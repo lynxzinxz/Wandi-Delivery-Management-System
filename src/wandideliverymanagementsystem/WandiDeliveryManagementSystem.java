@@ -4,449 +4,482 @@ import java.util.*;
 
 public class WandiDeliveryManagementSystem {
 
-    public static int addOrder(Scanner scanner, ArrayList<String> orderStatus, String[] status, ArrayList<String> orderId, ArrayList<String> senderName, ArrayList<String> recipientName, int count) {
-        int i = 0;
+    // reusable method to get a valid non-blank Order ID from the user
+    public static String getOrderId(Scanner scanner) {
+        String id = "";
+        while (id.isBlank()) {
+            System.out.println();
+            System.out.print("Enter Order ID  : ");
+            id = scanner.nextLine().trim().toUpperCase();
+            if (id.isBlank()) {
+                System.out.println("\n----------------------------------------------------\n"
+                        + "             ✗ Order ID cannot be empty.\n"
+                        + "            Please enter a valid Order ID.\n"
+                        + "----------------------------------------------------");
+            }
+        }
+        return id; // returns the valid ID back to whoever called this method
+    }
+
+    // reusable method to display a "not found" error for a given Order ID
+    public static void printNotFound(String id, Scanner scanner) {
+        // display this message when the entered Order ID is not found in the system
+        System.out.println(
+                "----------------------------------------------------\n"
+                + "       ✗ No order found with ID \"" + id + "\".\n"
+                + "      Please verify the Order ID and try again.\n"
+                + "----------------------------------------------------\n");
+        pause(scanner);
+    }
+
+    // reusable method to display the details of a specific order at index i
+    public static void printOrderDetails(int i, ArrayList<String> orderId, ArrayList<String> senderName, ArrayList<String> recipientName, ArrayList<String> orderStatus) {
+        System.out.println("----------------------------------------------------\n"
+                + "                   ORDER DETAILS\n"
+                + "----------------------------------------------------");
+        System.out.println("Order ID  : " + orderId.get(i));
+        System.out.println("Sender    : " + senderName.get(i));
+        System.out.println("Recipient : " + recipientName.get(i));
+        System.out.println("Status    : " + orderStatus.get(i));
+        System.out.println("----------------------------------------------------\n");
+    }
+
+    // pause method, to stops the screen so the user has time to read the result before returning to menu
+    public static void pause(Scanner scanner) {
+        System.out.println("Press ENTER to return to menu...");
+        scanner.nextLine(); // Holds the screen until the user presses ENTER
+    }
+
+//     Adds a new delivery order.
+//     
+//      Steps:
+//     1. Ask for a unique Order ID
+//     2. Ask for sender and recipient names
+//     3. Automatically set status to "Preparing"
+    public static void addOrder(Scanner scanner, ArrayList<String> orderStatus, String[] status,
+            ArrayList<String> orderId, ArrayList<String> senderName, ArrayList<String> recipientName) {
+
         System.out.println("====================================================\n"
                 + "                      ADD ORDER\n"
                 + "====================================================");
-        System.out.println();
-        String id = " ";
-        String sender = " ";
-        String reciever = " ";
 
-        while (id.isBlank()) {
-            System.out.print("Enter Order ID  : ");
-            id = scanner.nextLine();
+        String sender = "";
+        String receiver = "";
 
-            if (id.isBlank()) {
-                System.out.println("ID cannot be blank ");
-                System.out.println();
+        // getOrderId() handles all the input validation for Order ID (blank check, trim, uppercase)
+        // instead of repeating the same while loop in every method, we call this once and get back a clean, valid ID
+        String id = getOrderId(scanner);
+
+        // Check if the Order ID already exists because each order must be unique.
+        // If duplicates are allowed, it would be confusing when searching, updating, or deleting orders.
+        boolean exists = false;
+
+        // Loop through all stored Order IDs to see if any match the new one
+        for (int x = 0; x < orderId.size(); x++) {
+            if (orderId.get(x).equals(id)) {
+                exists = true;   // A match was found, so the ID already exists in the system, mark it as true
+                break;         // Stop searching immediately, no need to check further
             }
         }
 
+        // if the exist value is true (duplicate was found), then show an error and exit
+        if (exists) {
+            System.out.println();
+            System.out.println("----------------------------------------------------\n"
+                    + "       ✗ Order ID \"" + id + "\" already exists.\n"
+                    + " Choose a different ID or update the existing order.\n"
+                    + "----------------------------------------------------\n");
+            pause(scanner); // pauses so the user can read the error message before continuing
+            return; // exit the method
+        }
+
+        // If no duplicate was found, the ID is safe to store in the system
         orderId.add(id);
 
-        if (count > 1) {//Checks if first time using addOrder() function
-            for (int x = 0; x < count; x++) {//for-loop for break and continue statement
-                if (orderId.get(count - 1).equals(orderId.get(x))) {// Comparing if the current order Id is equal to the previous ones
-                    if (x == count - 1) {//To skip the current index of the Id
-                        continue;// Skip the entire loop
-                    }
-                    System.out.println("----------------------------------------------------");
-                    System.out.println("            ✗ Error: Order ID " + orderId.get(count - 1) + " already exists.");
-                    System.out.println("         Use option [5] to update its status instead.");
-                    System.out.println("----------------------------------------------------");
-                    i++;// for while loop to not function
-                    orderId.remove(count - 1);
-                    count--;
-                    break;
-                }
+        // Get sender name and keep asking until a valid (non-blank) input is entered
+        while (sender.isBlank()) {
+            System.out.print("Sender Name     : ");
+            sender = scanner.nextLine();
+
+            // If the user just presses ENTER or types spaces,
+            // display an error message and ask again
+            if (sender.isBlank()) {
+                System.out.println();
+                System.out.println("----------------------------------------------------\n"
+                        + "           ✗ Sender name cannot be empty.\n"
+                        + "            Please enter the sender's name.\n"
+                        + "----------------------------------------------------\n");
             }
         }
+        senderName.add(sender); // store sender name only after valid input is entered
 
-        while (i == 0) {
-            while (sender.isBlank()) {
-                System.out.print("Sender Name     : ");
-                sender = scanner.nextLine();
+        // get receiver name and keep asking until a valid (non-blank) input is entered
+        while (receiver.isBlank()) {
+            System.out.print("Recipient Name  : ");
+            receiver = scanner.nextLine();
 
-                if (sender.isBlank()) {
-                    System.out.println("Sender name cannot be blank ");
-                    System.out.println();
-                }
+            // If the user just presses ENTER or types spaces,
+            // display an error message and ask again
+            if (receiver.isBlank()) {
+                System.out.println();
+                System.out.println("----------------------------------------------------\n"
+                        + "          ✗ Recipient name cannot be empty.\n"
+                        + "          Please enter the recipient's name.\n"
+                        + "----------------------------------------------------\n");
             }
-
-            senderName.add(sender);
-
-            while (reciever.isBlank()) {
-                System.out.print("Recipient Name  : ");
-                reciever = scanner.nextLine();
-
-                if (reciever.isBlank()) {
-                    System.out.println("Reciever name cannot be blank ");
-                    System.out.println();
-                }
-            }
-            recipientName.add(reciever);
-
-            System.out.println();
-
-            System.out.println("----------------------------------------------------");
-            System.out.println("          ✓ Order " + id + " added successfully!");
-            orderStatus.add(status[0]); // when a new order is added, its default status is automatically set to "Preparing"
-            System.out.println("             Status set to: [" + orderStatus.get(orderStatus.size() - 1) + "]"); // prints the most recently added order status (last item in the list)
-            System.out.println("----------------------------------------------------");
-            i++;//Iteration to stop the loop entirely
         }
+        recipientName.add(receiver); // store recipient name only after valid input is entered
+
+        // set the default status of a new order
+        orderStatus.add(status[0]);   // status[0] = "Preparing" — all new orders start at this stage
 
         System.out.println();
-        System.out.println("Press ENTER to return to menu...");
-        scanner.nextLine();
-        return count;
+        System.out.println("----------------------------------------------------\n"
+                + "      ✓ Order \"" + id + "\" added successfully!");
+
+        // orderStatus.size() - 1 gets the most recently added status
+        // (the last element in the list)
+        System.out.println("             Status set to: [" + orderStatus.get(orderStatus.size() - 1) + "]\n"
+                + "----------------------------------------------------\n");
+
+        pause(scanner); // give time for user to read the success message
     }
 
-    public static int deleteOrder(Scanner scanner, ArrayList<String> orderStatus, String[] status, ArrayList<String> orderId, ArrayList<String> senderName, ArrayList<String> recipientName, int count) {
+    // DELETE ORDER
+    public static void deleteOrder(Scanner scanner, ArrayList<String> orderStatus,
+            ArrayList<String> orderId, ArrayList<String> senderName, ArrayList<String> recipientName) {
+
         System.out.println("====================================================\n"
                 + "                    DELETE ORDER\n"
                 + "====================================================");
-        System.out.println();
-        int i = 0;
-        String id = " ";
 
-        while (id.isBlank()) {
-            System.out.print("Enter Order ID  : ");
-            id = scanner.nextLine();
+        // Validate input until a non-blank Order ID is entered
+        // with this getOrderId() which handles all the input validation 
+        String id = getOrderId(scanner);
 
-            if (id.isBlank()) {
-                System.out.println("ID cannot be blank ");
-                System.out.println();
-            }
-        }
+        // search for the order by comparing the entered ID with all stored IDs
+        for (int i = 0; i < orderId.size(); i++) {
 
-        orderId.add(id);
+            if (orderId.get(i).equals(id)) { // check if the entered ID matches a stored Order ID
 
-        if (count < 1) {
-            System.out.println("----------------------------------------------------");
-            System.out.println("          ✗ Error: Order ID " + id + " not found.");
-            System.out.println("              Check the ID and try again.");
-            System.out.println("----------------------------------------------------");
-        } else {
-            for (int t = 0; t < count; t++) {
-                if (orderId.get(t).equals(id)) {
-                    System.out.println("----------------------------------------------------\n"
-                            + "                   ORDER DETAILS\n"
-                            + "----------------------------------------------------");
-                    System.out.println("ID      : " + id);
-                    System.out.println("Status  : " + orderStatus.get(t));
-                    System.out.println("----------------------------------------------------");
+                // display order details first before before deletion
+                // printOrderDetails() is a reusable method that displays the full details of an order
+                // (Order ID, Sender, Recipient, Status) using the index i to find the right order across all lists
+                printOrderDetails(i, orderId, senderName, recipientName, orderStatus);
+                
+                // confirmation loop -- ask user for confirm deletion
+                // keeps asking until Y or N is entered
+                while (true) {
                     System.out.print("Are you sure you want to delete this order? (Y/N): ");
-                    String answer = scanner.nextLine();
+                    String input = scanner.nextLine();
                     System.out.println();
-                    if (answer.equalsIgnoreCase("Y")) {
-                        System.out.println("----------------------------------------------------");
-                        System.out.println("             Order " + id + " has been deleted.");
-                        System.out.println("----------------------------------------------------");
-                        orderId.remove(t);
-                        senderName.remove(t);
-                        recipientName.remove(t);
-                        //can cause mismatch
-                        orderStatus.remove(t);
-                        count--;
-                        i++;
-                        break;
-                    } else if (answer.equalsIgnoreCase("N")) {
-                        System.out.println("----------------------------------------------------");
-                        System.out.println("Delete Cancelled. ");
-                        System.out.println("----------------------------------------------------");
-                        System.out.println();
-                        i++;
+
+                    if (input.equalsIgnoreCase("Y")) {
+
+                        // if user enters "Y", remove all data related to this order at index i
+                        orderId.remove(i);
+                        senderName.remove(i);
+                        recipientName.remove(i);
+                        orderStatus.remove(i);
+
+                        // display successfull message
+                        System.out.println("----------------------------------------------------\n"
+                                + "      ✓ Order \"" + id + "\" deleted successfully.\n"
+                                + "----------------------------------------------------\n");
+                        pause(scanner);
+                        return; // Exit after successful deletion
+
+                    } else if (input.equalsIgnoreCase("N")) { // If user enters "N", cancel the deletion process
+                        // no changes are made to any data, and display cancellation
+                        System.out.println("----------------------------------------------------\n"
+                                + "                Operation cancelled.\n"
+                                + "               No orders were deleted.\n"
+                                + "----------------------------------------------------\n");
+                        pause(scanner);
+                        return; // exit without making any changes
 
                     } else {
-                        System.out.println("ERROR: Please enter Y or N only. ");
-                        i++;
+                        // neither Y nor N, ask user again until valid input is entered
+                        System.out.println("----------------------------------------------------\n"
+                                + "                 ✗ Invalid input.\n"
+                                + "         Please enter Y for Yes or N for No.\n"
+                                + "----------------------------------------------------\n");
                     }
                 }
             }
-            while (i == 0) {
-                System.out.println("----------------------------------------------------");
-                System.out.println("            ✗ Error: Order ID " + id + " not found.");
-                System.out.println("              Check the ID and try again.");
-                System.out.println("----------------------------------------------------");
-                i++;
-            }
         }
-        System.out.println("Press ENTER to return to menu...");
-        scanner.nextLine();
-        return count;
+
+        // reached here means no order matched the entered ID
+        // printNotFound() is a reusable method that displays the "order not found" error message
+        // and pauses the screen used whenever a searched ID does not exist in the system
+        printNotFound(id, scanner);
     }
 
-    public static void searchOrder(Scanner scanner, ArrayList<String> orderStatus, String[] status, ArrayList<String> orderId, ArrayList<String> senderName, ArrayList<String> recipientName, int count) {
+    // SEARCH ORDER
+    public static void searchOrder(Scanner scanner, ArrayList<String> orderStatus,
+            ArrayList<String> orderId, ArrayList<String> senderName, ArrayList<String> recipientName) {
+
         System.out.println("====================================================\n"
                 + "                    SEARCH ORDER\n"
                 + "====================================================");
-        System.out.println();
-        String id = " ";
-        int i = 0;
 
-        while (id.isBlank()) {
-            System.out.print("Enter Order ID  : ");
-            id = scanner.nextLine();
+        // Validate input until a non-blank Order ID is entered
+        // with this getOrderId() which handles all the input validation 
+        String id = getOrderId(scanner);
 
-            if (id.isBlank()) {
-                System.out.println("ID cannot be blank ");
-                System.out.println();
+        // Search through all stored orders
+        for (int i = 0; i < orderId.size(); i++) {
+
+            if (orderId.get(i).equals(id)) { // if match found, display order details
+            // reuse printOrderDetails() to display the found order's full details
+            printOrderDetails(i, orderId, senderName, recipientName, orderStatus);
+
+                pause(scanner);
+                return; // early exit
             }
         }
 
-        System.out.println();
-        if (count < 1) {
-            System.out.println("----------------------------------------------------");
-            System.out.println("            ✗ Error: Order ID " + id + " not found.");
-            System.out.println("              Check the ID and try again.");
-            System.out.println("----------------------------------------------------");
-        } else {
-            for (int z = 0; z < count; z++) {
-                if (orderId.get(z).equals(id)) {
-                    System.out.println("----------------------------------------------------\n"
-                            + "                   ORDER DETAILS\n"
-                            + "----------------------------------------------------");
-                    System.out.println();
-                    System.out.println("Order ID  : " + orderId.get(z));
-                    System.out.println("Sender    : " + senderName.get(z));
-                    System.out.println("Recipient : " + recipientName.get(z));
-                    System.out.println("Status    : " + orderStatus.get(z));
-                    System.out.println();
-                    System.out.println("----------------------------------------------------");
-                    i++;
-                    break;
-                }
-            }
-            while (i == 0) {
-                System.out.println("----------------------------------------------------");
-                System.out.println("            ✗ Error: Order ID " + id + " not found.");
-                System.out.println("              Check the ID and try again.");
-                System.out.println("----------------------------------------------------");
-                i++;
-            }
-        }
-
-        System.out.println("Press ENTER to return to menu...");
-        scanner.nextLine();
+        // reuse printNotFound() to display the standard "order not found" error
+        printNotFound(id, scanner);
     }
 
-    // viewOrders method
-    public static void ViewOrders(Scanner scanner, ArrayList<String> orderStatus, String[] status, ArrayList<String> orderId, ArrayList<String> senderName, ArrayList<String> recipientName, int count) {
+    // VIEW ORDERS
+    public static void viewOrders(Scanner scanner, ArrayList<String> orderStatus,
+            ArrayList<String> orderId, ArrayList<String> senderName, ArrayList<String> recipientName) {
 
         System.out.println("====================================================\n"
                 + "         WANDI TRACKING SYSTEM — ALL ORDERS\n"
                 + "====================================================");
-        System.out.println();
 
-        // if there are no orders, stop the method
-        if (count == 0) {
+        // If no orders have been added yet, inform the user and exit
+        if (orderId.isEmpty()) {
             System.out.println("No orders available.");
+            pause(scanner);
             return;
         }
 
+        // delivery stages in order
         String[] categories = {"Preparing", "Packed", "Shipped", "Delivered"};
 
-        // outer loop through each status category
+        // Loop through each status category and display its orders
         for (String currentStatus : categories) {
-            int statusCount = 0;    // counts how many orders are in this status
 
-            // first loop: count how many orders match this status
-            for (int i = 0; i < count; i++) {
+            int statusCount = 0;
+
+            // loop through all orders and count how many match the current status
+            // each time a matching status is found, increase statusCount by 1            
+            for (int i = 0; i < orderId.size(); i++) {
                 if (orderStatus.get(i).equals(currentStatus)) {
-                    statusCount++;
+                    statusCount++; // add 1 for every matching order
                 }
             }
 
-            // if statusCount has orders then print
-            // print only that has a orders
+            // display the current status and number of matching orders
+            System.out.println();
+            System.out.println("[ " + currentStatus + " ] - " + statusCount + " orders");
+            System.out.println("--------------------------------------------------");
+
+            // If no orders exist under this status, show a message
             if (statusCount == 0) {
                 System.out.println("No orders found under [ " + currentStatus + " ] status.");
             } else {
-                System.out.println();
-                System.out.println("[ " + currentStatus + " ] - " + statusCount + " orders");
-                System.out.println("--------------------------------------------------");
-                System.out.println("#   ORDER ID       SENDER             RECIPIENT");
-                int num = 1;
+                // if it has a statuscount then 
+                int num = 1; // Row number for displayed orders
 
-                for (int i = 0; i < orderStatus.size(); i++) {
+                // column headers for the order table
+                System.out.println("#   ORDER ID       SENDER             RECIPIENT");
+
+                // print only orders that match this status
+                for (int i = 0; i < orderId.size(); i++) {
                     if (orderStatus.get(i).equals(currentStatus)) {
 
+                        // printf keeps columns aligned regardless of text length:
+                        // %-3d  = row number, left-aligned in 3 characters
+                        // %-14s = Order ID, left-aligned in 14 characters
+                        // %-18s = Sender name, left-aligned in 18 characters
+                        // %-17s = Recipient name, left-aligned in 17 characters
                         System.out.printf("%-3d %-14s %-18s %-17s%n",
                                 num,
                                 orderId.get(i),
                                 senderName.get(i),
                                 recipientName.get(i));
-                        num++;
+                        num++; // increase row number only for displayed orders
                     }
                 }
             }
         }
-        System.out.println();
-        System.out.println("--------------------------------------------------\n"
-                + "TOTAL ORDERS: " + orderId.size()
-                + "\n-------------------------------------------------- ");
-        System.out.println("Press ENTER to return to menu...");
-        scanner.nextLine();
+
+        // ---- DELIVERY SUMMARY ----
+        int delivered = 0;
+        int pending = 0;
+
+        // count how many orders are fully delivered vs still in progress
+        for (int i = 0; i < orderId.size(); i++) {
+            if (orderStatus.get(i).equals("Delivered")) {
+                delivered++; // plus 1 when order is completed/set to delivered
+            } else {
+                pending++; // Preparing, Packed, or Shipped = still pending
+            }
+        }
+
+        // calculate completion rate as a percentage
+        // formula: (number of delivered orders ÷ total orders) × 100
+        // 100.0 is used to force decimal calculation so results are accurate (not rounded down)
+        double completionRate = (delivered * 100.0) / orderId.size();
+
+        System.out.println("\n====================================================\n"
+                + "                  DELIVERY SUMMARY\n"
+                + "====================================================");
+        System.out.println("  Total Orders    : " + orderId.size());
+        System.out.println("  Completed       : " + delivered);
+        System.out.println("  Pending         : " + pending);
+
+        // shows completion rate with 1 decimal place and adds % sign in output
+        System.out.printf("  Completion Rate : %.1f%%%n", completionRate);
+        System.out.println("====================================================\n");
+
+        pause(scanner);
     }
 
-    public static void updateStatus(Scanner scanner, ArrayList<String> orderStatus, String[] status, ArrayList<String> orderId, ArrayList<String> senderName, ArrayList<String> recipientName, int count) {
+    // UPDATE STATUS
+    public static void updateStatus(Scanner scanner, ArrayList<String> orderStatus, String[] status,
+            ArrayList<String> orderId, ArrayList<String> senderName, ArrayList<String> recipientName) {
+
         System.out.println("====================================================\n"
                 + "                    UPDATE STATUS                 \n"
                 + "====================================================");
-        System.out.println();
-        String id = " ";
-        char answer = ' ';
-        int x = 0;
 
-        while (id.isBlank()) {
-            System.out.print("Enter Order ID  : ");
-            id = scanner.nextLine();
+        // Validate input until a non-blank Order ID is entered
+        // with this getOrderId() which handles all the input validation 
+        String id = getOrderId(scanner);
 
-            if (id.isBlank()) {
-                System.out.println("ID cannot be blank ");
-                System.out.println();
-            }
-        }
-        System.out.println();
+        // Search through all orders to find a matching ID
+        for (int i = 0; i < orderId.size(); i++) {
 
-        if (count < 1) {
-            System.out.println("----------------------------------------------------");
-            System.out.println("          ✗ Error: Order ID " + id + " not found.");
-            System.out.println("              Check the ID and try again.");
-            System.out.println("----------------------------------------------------");
-        } else {
-            for (int t = 0; t < count; t++) {
-                if (orderId.get(t).equals(id)) {
-                    System.out.println("ORDER FOUND");
-                    System.out.println("ID      : " + id);
-                    System.out.println("Current : " + orderStatus.get(t));
-                    //"Preparing", "Packed", "Shipped", "Delivered"
+            if (orderId.get(i).equals(id)) { // Found the order at index i
 
-                    //update: only be allowed to take y/Y/n/N, other than that it will be error.
-                    if (orderStatus.get(t).equals(status[0])) {
-                        System.out.println("Next    : [" + status[1] + "]   <- will be set");
-                        while (true) {
-                            System.out.print("Confirm update to " + status[1].toUpperCase() + "? (Y/N): ");
-                            String input = scanner.nextLine();
-                            if (input.equalsIgnoreCase("Y")) {
-                                answer = 'Y';
-                                break;
+                System.out.println("----------------------------------------------------\n"
+                        + "                  Order Details\n"
+                        + "----------------------------------------------------");
+                System.out.println("ID      : " + id);
+                System.out.println("Status  : " + orderStatus.get(i));
+                System.out.println("----------------------------------------------------\n");
 
-                            } else if (input.equalsIgnoreCase("N")) {
-                                answer = 'N';
-                                break;
+                String current = orderStatus.get(i); // current status of the order
+                String next;             // will store the next status in the delivery process
 
-                            } else {
-                                System.out.println("ERROR: Please enter Y or N only.");
-                            }
-                        }
+                // Determine the next status based on where the order currently is
+                // status[] = {"Preparing", "Packed", "Shipped", "Delivered"}
+                if (current.equals(status[0])) {        // Preparing → Packed
+                    next = status[1];
+                } else if (current.equals(status[1])) { // Packed → Shipped
+                    next = status[2];
+                } else if (current.equals(status[2])) { // Shipped → Delivered
+                    next = status[3];
+                } else {
+                    // order is already delivered, so it cannot be updated further, inform the user
+                    System.out.println(
+                            "----------------------------------------------------\n"
+                            + "            No further updates possible.\n"
+                            + "----------------------------------------------------\n");
+                    pause(scanner);
+                    return;
+                }
 
-                    } else if (orderStatus.get(t).equals(status[1])) {
-                        System.out.println("Next    : [" + status[2] + "]   <- will be set");
+                // Ask user for confirmation before updating status
+                while (true) {
+                    System.out.print("Confirm update to [" + next + "]? (Y/N): ");
+                    String input = scanner.nextLine();
+                    System.out.println();
 
-                        while (true) {
+                    if (input.equalsIgnoreCase("Y")) {
+                        // replace the current status at index i with the next status
+                        orderStatus.set(i, next);
 
-                            System.out.print("Confirm update to " + status[2].toUpperCase() + "? (Y/N): ");
+                        System.out.println("----------------------------------------------------\n"
+                                + "            ✓ Status updated successfully.\n"
+                                + "       \"" + id + "\" : [" + current + "] → [" + next + "]\n"
+                                + "----------------------------------------------------\n");
+                        pause(scanner);
+                        return;
 
-                            String input = scanner.nextLine();
+                    } else if (input.equalsIgnoreCase("N")) {
+                        // if user cancel update
+                        System.out.println(
+                                "----------------------------------------------------\n"
+                                + "               Status update cancelled.\n"
+                                + "                 No changes applied.\n"
+                                + "----------------------------------------------------\n");
+                        pause(scanner);
+                        return;
 
-                            if (input.equalsIgnoreCase("Y")) {
-                                answer = 'Y';
-                                break;
-
-                            } else if (input.equalsIgnoreCase("N")) {
-                                answer = 'N';
-                                break;
-
-                            } else {
-                                System.out.println("ERROR: Please enter Y or N only.");
-                            }
-                        }
-
-                    } else if (orderStatus.get(t).equals(status[2])) {
-                        System.out.println("Next    : [" + status[3] + "]   <- will be set");
-                        System.out.println("----------------------------------------------------");
-                        while (true) {
-
-                            System.out.print("Confirm update to " + status[3].toUpperCase() + "? (Y/N): ");
-
-                            String input = scanner.nextLine();
-
-                            if (input.equalsIgnoreCase("Y")) {
-                                answer = 'Y';
-                                break;
-
-                            } else if (input.equalsIgnoreCase("N")) {
-                                answer = 'N';
-                                break;
-
-                            } else {
-                                System.out.println("ERROR: Please enter Y or N only.");
-                            }
-                        }
                     } else {
-                        System.out.println("----------------------------------------------------");
-                        System.out.println("            ✗ Order " + orderId.get(t) + " is already " + status[3].toUpperCase() + ".");
-                        System.out.println("               No further updates possible.");
-                        System.out.println("----------------------------------------------------");
+                        // Invalid input handling
+                        System.out.println("----------------------------------------------------\n"
+                                + "                 ✗ Invalid input.\n"
+                                + "         Please enter Y for Yes or N for No.\n"
+                                + "----------------------------------------------------\n");
                     }
-
-                    if (answer == 'Y') {
-                        System.out.println("----------------------------------------------------");
-
-                        if (orderStatus.get(t).equals(status[0])) {
-                            System.out.println("             ✓ " + orderId.get(t) + " successfully updated!");
-                            System.out.println("             [" + orderStatus.get(t) + "] → [" + status[1] + "]");
-
-                            orderStatus.set(t, status[1]); //Changing the value of index t to desired value
-
-                        } else if (orderStatus.get(t).equals(status[1])) {
-                            System.out.println("             ✓ " + orderId.get(t) + " successfully updated!");
-                            System.out.println("             [" + orderStatus.get(t) + "] → [" + status[2] + "]");
-
-                            orderStatus.set(t, status[2]);//Changing the value of index t to desired value
-
-                        } else {
-                            System.out.println("             ✓ " + orderId.get(t) + " successfully updated!");
-                            System.out.println("             [" + orderStatus.get(t) + "] → [" + status[3] + "]");
-
-                            orderStatus.set(t, status[3]);//Changing the value of index t to desired value
-
-                        }
-
-                        System.out.println("----------------------------------------------------");
-                        break;
-                    }
-                    if (answer == 'N') {
-                        System.out.println("----------------------------------------------------");
-                        System.out.println("Update Cancelled. ");
-                        System.out.println("----------------------------------------------------");
-                        System.out.println();
-
-                    }
-                    x++;//For while loop to not function
-                }
-                while (x == 0) {
-                    System.out.println("----------------------------------------------------");
-                    System.out.println("            ✗ Error: Order ID " + id + " not found.");
-                    System.out.println("              Check the ID and try again.");
-                    System.out.println("----------------------------------------------------");
-                    x++;
                 }
             }
         }
-        System.out.println("Press ENTER to return to menu...");
-        scanner.nextLine();
+
+        // reuse printNotFound() to display the standard "order not found" error
+        printNotFound(id, scanner);
     }
 
     // FILTER
-    public static void FilterByStatus(Scanner scanner, ArrayList<String> orderStatus, String[] status, ArrayList<String> orderId, ArrayList<String> senderName, ArrayList<String> recipientName) {
+    public static void filterByStatus(Scanner scanner, ArrayList<String> orderStatus,
+            ArrayList<String> orderId, ArrayList<String> senderName, ArrayList<String> recipientName) {
+
         System.out.println("====================================================\n"
                 + "                  FILTER BY STATUS\n"
                 + "====================================================");
-        System.out.println();
 
         System.out.println("  [1]  Preparing             [3]  Shipped \n"
                 + "  [2]  Packed                [4]  Delivered\n"
                 + "        \t   [5]  Exit\n"
                 + "----------------------------------------------------");
-        System.out.print("Select status: ");
-        int statusChoice = scanner.nextInt();
-        System.out.println("");
-        scanner.nextLine();
 
-        if (statusChoice == 5) {
-            System.out.println("Returning to menu...");
-            return;
+        int statusChoice;
+
+        // Keep asking until a valid integer between 1 and 5 is entered
+        while (true) {
+            System.out.print("Select status: ");
+
+            // Check if input is a number
+            if (!scanner.hasNextInt()) {
+                scanner.nextLine();  // if input is not a number then clear the invalid input and try again
+                System.out.println("----------------------------------------------------\n"
+                        + "                 ✗ Invalid input.\n"
+                        + "          Please select from [1 - 5].\n"
+                        + "----------------------------------------------------\n");
+                continue; // restart loop
+            }
+
+            // read the number input, store in status choice
+            statusChoice = scanner.nextInt();
+            scanner.nextLine(); // consume the leftover newline after reading the integer
+            System.out.println();
+
+            if (statusChoice >= 1 && statusChoice <= 5) { // check if number is within valid range
+                break;
+            }
+            // display if number is not 1-5
+            System.out.println("----------------------------------------------------\n"
+                    + "                 ✗ Invalid input.\n"
+                    + "       Please select a number from [1] to [5]\n"
+                    + "----------------------------------------------------\n");
         }
 
-        // Variable that will store the selected status text
-        String selectedStatus = "";
+        // if user input is 5 then go back to the main menu
+        if (statusChoice == 5) {
+            System.out.println("Returning to menu...\n");
+            return; // exit method
+        }
 
-        // Convert number choice into a status name
+        // convert number choice into actual status text
+        String selectedStatus = "";
         switch (statusChoice) {
             case 1:
                 selectedStatus = "Preparing";
@@ -460,70 +493,72 @@ public class WandiDeliveryManagementSystem {
             case 4:
                 selectedStatus = "Delivered";
                 break;
-            default:
-                System.out.println("Invalid Input. Please try again. ");
-                break;
         }
 
-        // Variable used to count matching orders
+        // count how many orders match the selected status
         int statusCount = 0;
-
-        for (int i = 0; i < orderStatus.size(); i++) {
-
+        for (int i = 0; i < orderId.size(); i++) {
             if (orderStatus.get(i).equals(selectedStatus)) {
-                statusCount++;
+                statusCount++; // increase count if match found
             }
         }
 
         if (statusCount == 0) {
-            // Message if no orders match the selected status
-            System.out.println("No orders found under [ " + selectedStatus + " ] status.");
+            // if no orders found under this status, inform user
+            System.out.println("No orders available under [ " + selectedStatus + " ] status.");
         } else {
-
+            // if there are matching orders, display the results for the selected status
+            System.out.println("--------------------------------------------------");
             System.out.println("[ " + selectedStatus + " ] - " + statusCount + " orders");
-
             System.out.println("--------------------------------------------------");
             System.out.println("#   ORDER ID       SENDER             RECIPIENT");
-            int num = 1;
-            for (int s = 0; s < orderId.size(); s++) {
 
-                if (orderStatus.get(s).equals(selectedStatus)) {
+            int num = 1; // Row counter
 
-                    // display orders under this status
+            // Print only orders that match selected status
+            for (int i = 0; i < orderId.size(); i++) {
+                if (orderStatus.get(i).equals(selectedStatus)) {
+
                     System.out.printf("%-3d %-14s %-18s %-17s%n",
                             num,
-                            orderId.get(s),
-                            senderName.get(s),
-                            recipientName.get(s));
-                    num++;
+                            orderId.get(i),
+                            senderName.get(i),
+                            recipientName.get(i));
+                    num++; // increase row number
                 }
             }
-
         }
 
-        System.out.println();
-        System.out.println("Press ENTER to return to menu...");
-        scanner.nextLine();
+        System.out.println("--------------------------------------------------\n");
+        pause(scanner);
     }
 
+    // EXIT
     public static void exit() {
-        System.out.println("====================================================\n"
-                + "      Thank you for using Wandi Tracking System\n"
-                + "====================================================");
+        System.out.println(
+                "====================================================\n"
+                + " Thank you for using Wandi Delivery Tracking System!\n"
+                + "            Session ended Successfully.\n"
+                + "===================================================");
     }
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
+
+        // Order goes through these stages in order
         String[] status = {"Preparing", "Packed", "Shipped", "Delivered"};
-        ArrayList<String> orderId = new ArrayList<>();
-        ArrayList<String> senderName = new ArrayList<>();
-        ArrayList<String> recipientName = new ArrayList<>();
-        ArrayList<String> orderStatus = new ArrayList<>();
-        int count = 0;
-        int option = 0;
 
+        // Parallel lists: same index = same order information
+        ArrayList<String> orderId = new ArrayList<>();       // Unique ID for each order
+        ArrayList<String> senderName = new ArrayList<>();    // Who sent the package
+        ArrayList<String> recipientName = new ArrayList<>(); // Who receives the package
+        ArrayList<String> orderStatus = new ArrayList<>();   // Current stage of the order
+
+        int option = 0; // stores the user's menu choice
+
+        // Main loop: keep showing menu until user chooses Exit
+        // display menu first before evaluate the user input
         do {
-
             System.out.println("====================================================\n"
                     + "            Wandi Delivery Tracking System\n"
                     + "====================================================");
@@ -533,68 +568,63 @@ public class WandiDeliveryManagementSystem {
                     + "  [3]  Search Order          [6]  Filter by Status\n"
                     + "        \t   [7]  Exit\n"
                     + "----------------------------------------------------");
+
+            // Input validation (only accept numbers 1–7)
             while (true) {
                 System.out.print("Select option: ");
-                if (scanner.hasNextInt()) {
-                    option = scanner.nextInt();
-                    break;
-                } else {
-                    System.out.println("Invalid input! Please try again. ");
-                    scanner.next();
+
+                // check if user inpput is a number
+                if (!scanner.hasNextInt()) {
+                    scanner.nextLine();  // if not a number, clear invalid input
+                    System.out.println();
+                    System.out.println("----------------------------------------------------\n"
+                            + "              ✗ Invalid menu option\n"
+                            + "       Please select a number from [1] to [7]\n"
+                            + "----------------------------------------------------\n");
+                    continue; // ask user again 
                 }
 
-            }
-
-            /*               
-            while (id.isBlank()) {
-            System.out.print("Enter Order ID  : ");
-            id = scanner.nextLine();
-
-            if (id.isBlank()) {
-                System.out.println("ID cannot be blank ");
+                option = scanner.nextInt();
+                scanner.nextLine(); // consume leftover newline after nextInt()
                 System.out.println();
-            }
-        }
-             */
-            System.out.println();
-            scanner.nextLine();
 
+                if (option >= 1 && option <= 7) { // check is valid range
+                    break; // if valid, exit loop to proceed switch
+                }
+
+                // range error message
+                System.out.println("----------------------------------------------------\n"
+                        + "                 ✗ Invalid input.\n"
+                        + "             Please select from [1 - 7].\n"
+                        + "----------------------------------------------------\n");
+            }
+
+            // Route to the selected feature
             switch (option) {
                 case 1:
-                    count++;
-                    count = addOrder(scanner, orderStatus, status, orderId, senderName, recipientName, count);
+                    addOrder(scanner, orderStatus, status, orderId, senderName, recipientName);
                     break;
-
                 case 2:
-                    count = deleteOrder(scanner, orderStatus, status, orderId, senderName, recipientName, count);
+                    deleteOrder(scanner, orderStatus, orderId, senderName, recipientName);
                     break;
-
                 case 3:
-                    searchOrder(scanner, orderStatus, status, orderId, senderName, recipientName, count);
+                    searchOrder(scanner, orderStatus, orderId, senderName, recipientName);
                     break;
-
                 case 4:
-                    ViewOrders(scanner, orderStatus, status, orderId, senderName, recipientName, count);
+                    viewOrders(scanner, orderStatus, orderId, senderName, recipientName);
                     break;
-
                 case 5:
-                    updateStatus(scanner, orderStatus, status, orderId, senderName, recipientName, count);
+                    updateStatus(scanner, orderStatus, status, orderId, senderName, recipientName);
                     break;
-
                 case 6:
-                    FilterByStatus(scanner, orderStatus, status, orderId, senderName, recipientName);
+                    filterByStatus(scanner, orderStatus, orderId, senderName, recipientName);
                     break;
                 case 7:
                     exit();
                     break;
-                default:
-                    System.out.println("Invalid input! Please try again. ");
-                    break;
             }
-        } while (option != 7);
 
-        //        System.out.println(orderId);
-        //        System.out.println(senderName);
-        //        System.out.println(recipientName);
+        } while (option != 7); // keep running until user selects exit [7]
+        scanner.close(); // stop scanner since we no longer need user input
     }
 }
