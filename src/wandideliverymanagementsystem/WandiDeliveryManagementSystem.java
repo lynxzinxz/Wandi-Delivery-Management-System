@@ -24,6 +24,7 @@ public class WandiDeliveryManagementSystem {
     // reusable method to display a "not found" error for a given Order ID
     public static void printNotFound(String id, Scanner scanner) {
         // display this message when the entered Order ID is not found in the system
+        System.out.println();
         System.out.println(
                 "----------------------------------------------------\n"
                 + "       ✗ No order found with ID \"" + id + "\".\n"
@@ -34,6 +35,7 @@ public class WandiDeliveryManagementSystem {
 
     // reusable method to display the details of a specific order at index i
     public static void printOrderDetails(int i, ArrayList<String> orderId, ArrayList<String> senderName, ArrayList<String> recipientName, ArrayList<String> orderStatus) {
+        System.out.println();
         System.out.println("----------------------------------------------------\n"
                 + "                   ORDER DETAILS\n"
                 + "----------------------------------------------------");
@@ -248,12 +250,12 @@ public class WandiDeliveryManagementSystem {
             ArrayList<String> orderId, ArrayList<String> senderName, ArrayList<String> recipientName) {
 
         System.out.println("====================================================\n"
-                + "         WANDI TRACKING SYSTEM — ALL ORDERS\n"
+                + "    WANDI DELIVERY TRACKING SYSTEM — ALL ORDERS\n"
                 + "====================================================");
 
         // If no orders have been added yet, inform the user and exit
         if (orderId.isEmpty()) {
-            System.out.println("No orders available.");
+            System.out.println("\n    -----------  No orders available  -----------\n");
             pause(scanner);
             return;
         }
@@ -358,7 +360,7 @@ public class WandiDeliveryManagementSystem {
 
             if (orderId.get(i).equals(id)) { // Found the order at index i
 
-                System.out.println("----------------------------------------------------\n"
+                System.out.println("\n----------------------------------------------------\n"
                         + "                  Order Details\n"
                         + "----------------------------------------------------");
                 System.out.println("ID      : " + id);
@@ -452,7 +454,7 @@ public class WandiDeliveryManagementSystem {
                 statusChoice = scanner.nextInt();
             } catch (InputMismatchException e) {
                 scanner.nextLine();  // if not a number, clear invalid input
-                System.out.println("----------------------------------------------------\n"
+                System.out.println("\n----------------------------------------------------\n"
                         + "                 ✗ Invalid input.\n"
                         + "          Please select from [1 - 5].\n"
                         + "----------------------------------------------------\n");
@@ -536,8 +538,10 @@ public class WandiDeliveryManagementSystem {
     public static void exit() {
         System.out.println(
                 "====================================================\n"
-                + " Thank you for using Wandi Delivery Tracking System!\n"
-                + "            Session ended Successfully.\n"
+                + "            WANDI DELIVERY TRACKING SYSTEM\n"
+                + "====================================================\n"
+                + "            Thank you for using the system!\n"
+                + "              Session ended Successfully.\n"
                 + "===================================================");
     }
 
@@ -559,7 +563,7 @@ public class WandiDeliveryManagementSystem {
         // display menu first before evaluate the user input
         do {
             System.out.println("====================================================\n"
-                    + "            Wandi Delivery Tracking System\n"
+                    + "            WANDI DELIVERY TRACKING SYSTEM\n"
                     + "====================================================");
 
             System.out.println("  [1]  Add Order             [4]  View Orders \n"
